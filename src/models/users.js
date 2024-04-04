@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const { ServerConfig } = require("../config");
+import { Schema, model } from "mongoose";
+import { genSaltSync, hashSync } from "bcrypt";
+// import { ServerConfig } from "../config/index.js";
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -30,22 +30,18 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
-    email: {
-      type: Boolean,
-      required: true,
-    },
     courses: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Courses",
       },
     ],
     profile: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Profile",
     },
     courseProgress: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "CourseProgress",
     },
   },
@@ -54,12 +50,12 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", function (next) {
   const user = this;
-  const salt = bcrypt.genSaltSync(ServerConfig.SALT_VALUE);
-  const encryptedPassword = bcrypt.hashSync(user.password, salt);
+  const salt = genSaltSync(9);
+  const encryptedPassword = hashSync(user.password, salt);
   user.password = encryptedPassword;
   next();
 });
 
-const User = mongoose.model("User", userSchema);
+const User = model("User", userSchema);
 
-module.exports = User;
+export default User;

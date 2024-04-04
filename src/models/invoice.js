@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const invoiceSchema = new mongoose.Schema(
+const invoiceSchema = new Schema(
   {
     users: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
     courseName: {
@@ -23,13 +23,13 @@ const invoiceSchema = new mongoose.Schema(
       required: true,
     },
     courseId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Courses",
     },
   },
   { timestamps: true }
 );
 
-const Invoice = mongoose.model("invoice", invoiceSchema);
+const Invoice = model("invoice", invoiceSchema);
 
-module.exports = Invoice;
+export default Invoice;

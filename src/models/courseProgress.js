@@ -1,16 +1,16 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const progressSchema = new mongoose.Schema({
+const progressSchema = new Schema({
   courseId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Courses",
   },
   completedVideos: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "SubSection",
   },
 });
 
-const CourseProgress = mongoose.model("courseProgress", progressSchema);
+const CourseProgress = model("courseProgress", progressSchema);
 
-module.exports = CourseProgress;
+export default CourseProgress;

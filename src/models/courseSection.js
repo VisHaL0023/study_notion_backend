@@ -1,16 +1,16 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const sectionSchema = new mongoose.Schema({
+const sectionSchema = new Schema({
   sectionName: {
     type: String,
     required: true,
   },
   subSection: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "SubSection",
   },
 });
 
-const CourseSection = mongoose.model("courseSection", sectionSchema);
+const CourseSection = model("courseSection", sectionSchema);
 
-module.exports = CourseSection;
+export default CourseSection;

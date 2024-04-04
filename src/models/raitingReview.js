@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const raitingSchema = new mongoose.Schema(
+const raitingSchema = new Schema(
   {
     user: {
       type: String,
@@ -19,6 +19,6 @@ const raitingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const RaitingReview = mongoose.model("raitingReview", raitingSchema);
+const RaitingReview = model("raitingReview", raitingSchema);
 
-module.export = RaitingReview;
+export default RaitingReview;
