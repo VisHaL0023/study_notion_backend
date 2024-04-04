@@ -34,12 +34,20 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
-    //   courses: [
-    //     {
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: "courses"
-    //     }
-    // ]
+    courses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Courses",
+      },
+    ],
+    profile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
+    courseProgress: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CourseProgress",
+    },
   },
   { timestamps: true }
 );
