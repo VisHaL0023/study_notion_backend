@@ -12,8 +12,8 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      match: /\S+@\S+\.\S+/,
-      lowercase: true,
+      isEmail: true, //checks for email format
+      allowNull: false,
     },
     contactNumber: {
       type: String,
@@ -38,6 +38,13 @@ const userSchema = new Schema(
       required: true,
       default: false,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    token: {
+      type: String,
+    },
     courses: [
       {
         type: Schema.Types.ObjectId,
@@ -57,8 +64,10 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", function (next) {
-  const hashedPassword = bcrypt.hashSync(this.password, 9);
-  this.password = hashedPassword;
+  const user = this;
+  const salt = genSaltSync(9);
+  const encryptedPassword = hashSync(user.password, salt);
+  user.password = encryptedPassword;
   next();
 });
 

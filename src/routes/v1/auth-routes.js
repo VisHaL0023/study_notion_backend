@@ -7,5 +7,6 @@ let authController = new AuthController();
 
 router.post("/signup", authController.createUser);
 router.post("/login", authController.logIn);
+router.get("/verify-email/:id", authController.verifyemail);
 
 export default router;
