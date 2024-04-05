@@ -31,6 +31,23 @@ class AuthController {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
     }
   }
+
+  async logIn(req, res) {
+    try {
+      const response = await userService.signIn(req.body);
+
+      successObj.message = "Sign in successfully";
+      successObj.data = response.userData;
+      successObj.token = response.token;
+
+      return res.status(StatusCodes.OK).json(successObj);
+    } catch (error) {
+      errorObj.message = "Something went wrong while login a user";
+      errorObj.err = error;
+
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+    }
+  }
 }
 
 export default AuthController;

@@ -1,12 +1,10 @@
 import { Router } from "express";
-
-import { InfoController, AuthController } from "../../controllers/index.js";
+import authRoutes from "./auth-routes.js";
+import { InfoController } from "../../controllers/index.js";
 
 const router = Router();
 
-let authController = new AuthController();
-
+router.use("/", authRoutes);
 router.get("/info", InfoController.info);
-router.post("/signup", authController.createUser);
 
 export default router;
