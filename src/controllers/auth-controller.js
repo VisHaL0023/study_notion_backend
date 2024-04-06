@@ -10,13 +10,38 @@ class AuthController {
 
     async createUser(req, res) {
         try {
+            const {
+                firstName,
+                lastName,
+                email,
+                password,
+                contactNumber,
+                accountType,
+                otp,
+            } = req.body;
+
+            if (
+                !firstName ||
+                !lastName ||
+                !email ||
+                !password ||
+                !contactNumber ||
+                !accountType ||
+                !otp
+            ) {
+                errorObj.message = "All fields are required";
+                errorObj.success = false;
+                return res.status(StatusCodes.FORBIDDEN).json(errorObj);
+            }
+
             const response = await userService.signUp({
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                contactNumber: req.body.contactNumber,
-                accountType: req.body.accountType,
-                active: req.body.active,
+                firstName,
+                lastName,
+                email,
+                password,
+                contactNumber,
+                accountType,
+                otp,
             });
 
             successObj.message = "Successfully created a new user";
@@ -60,6 +85,27 @@ class AuthController {
             }
         } catch (error) {
             errorObj.message = "Something went wrong while verifing a user";
+            errorObj.err = error;
+
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+        }
+    }
+
+    async sendOtp(req, res) {
+        try {
+            const { email } = req.body;
+            if (!email) {
+                errorObj.message = "Email is required";
+                errorObj.success = false;
+                return res.status(StatusCodes.FORBIDDEN).json(errorObj);
+            }
+            const response = await userService.sendOtp(email);
+
+            successObj.message = "OTP Created successfully";
+            successObj.data = response;
+            return res.status(StatusCodes.OK).json(successObj);
+        } catch (error) {
+            errorObj.message = "Something went wrong while sending otp";
             errorObj.err = error;
 
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);

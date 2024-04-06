@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 const raitingSchema = new Schema(
     {
         user: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: "User",
         },
@@ -17,7 +17,7 @@ const raitingSchema = new Schema(
             max: [250, "Review cannot be of more than 250 characters"],
         },
         course: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: "Course",
             index: true,

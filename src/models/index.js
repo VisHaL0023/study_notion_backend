@@ -6,6 +6,7 @@ import CourseSection from "./courseSection.js";
 import RaitingReview from "./raitingReview.js";
 import Invoice from "./invoice.js";
 import Category from "./category.js";
+import OTP from "./OTP.js";
 
 export {
     User,
@@ -16,4 +17,5 @@ export {
     RaitingReview,
     Invoice,
     Category,
+    OTP,
 };

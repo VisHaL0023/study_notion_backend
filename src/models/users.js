@@ -4,16 +4,22 @@ import { genSaltSync, hashSync } from "bcrypt";
 
 const userSchema = new Schema(
     {
-        name: {
+        firstName: {
             type: String,
             required: true,
+            trim: true,
+        },
+        lastName: {
+            type: String,
+            required: true,
+            trim: true,
         },
         email: {
             type: String,
             required: true,
             unique: true,
             isEmail: true, //checks for email format
-            allowNull: false,
+            trim: true,
         },
         contactNumber: {
             type: String,
@@ -30,8 +36,8 @@ const userSchema = new Schema(
         accountType: {
             type: String,
             required: true,
-            default: "User",
-            enum: ["User", "Instructor", "Admin"],
+            default: "Student",
+            enum: ["Student", "Instructor", "Admin"],
         },
         active: {
             type: Boolean,

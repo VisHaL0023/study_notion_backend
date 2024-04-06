@@ -58,7 +58,7 @@ const courseSchema = new Schema(
             enum: ["Draft", "Published"],
         },
         category: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             // required: true,
             ref: "Category",
         },

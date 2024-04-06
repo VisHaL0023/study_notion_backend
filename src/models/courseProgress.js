@@ -6,7 +6,7 @@ const progressSchema = new Schema({
         ref: "Courses",
     },
     userID: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
     },
     completedVideos: {

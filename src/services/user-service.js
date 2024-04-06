@@ -1,11 +1,13 @@
-import { UserRepository } from "../repositories/index.js";
+import { UserRepository, OTPRepository } from "../repositories/index.js";
 import bcrypt from "bcrypt";
-import { ServerConfig, sendingMail } from "../config/index.js";
+import { ServerConfig } from "../config/index.js";
 import jsonwebtoken from "jsonwebtoken";
+import otpGenerator from "otp-generator";
 
 class UserService {
     constructor() {
         this.userRepository = new UserRepository();
+        this.otpRepository = new OTPRepository();
     }
 
     async generateJWT(reqbody) {
@@ -42,14 +44,13 @@ class UserService {
                     token: token,
                 });
                 if (token) {
-                    sendingMail({
-                        from: ServerConfig.NODE_MAILER_EMAIL,
-                        to: `${user.email}`,
-                        subject: "Account verification for Study Notion",
-                        text: `Hello, ${user.name} Please verify your email by
-            clicking this link :
-            http://localhost:${ServerConfig.PORT}/api/v1/auth/verify-email/${user.id}?token=${user.token} `,
-                    });
+                    //         sendingMail({
+                    //             to: `${user.email}`,
+                    //             subject: "Account verification for Study Notion",
+                    //             text: `Hello, ${user.name} Please verify your email by
+                    // clicking this link :
+                    // http://localhost:${ServerConfig.PORT}/api/v1/auth/verify-email/${user.id}?token=${user.token} `,
+                    //         });
                     throw {
                         success: true,
                         message: "Verify your mail",
@@ -145,6 +146,32 @@ class UserService {
         } catch (error) {
             console.log(error);
             throw error;
+        }
+    }
+
+    async sendOtp(email) {
+        try {
+            const user = await this.userRepository.findByEmail({ email });
+
+            if (user) {
+                throw {
+                    success: false,
+                    message: "User already exists for given email",
+                    data: {},
+                    error: {},
+                };
+            }
+
+            var otp = otpGenerator.generate(6, {
+                upperCaseAlphabets: true,
+                lowerCaseAlphabets: false,
+                specialChars: false,
+            });
+            const response = await this.otpRepository.create({ email, otp });
+            return response;
+        } catch (error) {
+            console.log(error);
+            return error;
         }
     }
 }
