@@ -1,35 +1,35 @@
 import { Schema, model } from "mongoose";
 
 const invoiceSchema = new Schema(
-  {
-    users: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    {
+        users: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+        },
+        courseName: {
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
+        address: {
+            type: String,
+            required: true,
+        },
+        pincode: {
+            type: String,
+            required: true,
+        },
+        courseId: {
+            type: Schema.Types.ObjectId,
+            ref: "Courses",
+        },
     },
-    courseName: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    address: {
-      type: String,
-      required: true,
-    },
-    pincode: {
-      type: String,
-      required: true,
-    },
-    courseId: {
-      type: Schema.Types.ObjectId,
-      ref: "Courses",
-    },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
-const Invoice = model("invoice", invoiceSchema);
+const Invoice = model("Invoice", invoiceSchema);
 
 export default Invoice;

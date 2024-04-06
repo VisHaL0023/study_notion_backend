@@ -2,7 +2,7 @@ let errorObj = {
     success: false,
     message: "Something went wrong",
     data: {},
-    err: {}
-}
+    err: {},
+};
 
 export default errorObj;

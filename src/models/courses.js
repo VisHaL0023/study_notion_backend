@@ -1,59 +1,71 @@
 import { Schema, model } from "mongoose";
 
 const courseSchema = new Schema(
-  {
-    courseName: {
-      type: String,
-      required: true,
+    {
+        courseName: {
+            type: String,
+            required: true,
+        },
+        courseDescription: {
+            type: String,
+            required: true,
+        },
+        whatYouWillLearn: {
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
+        thumbnail: {
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
+        studentEnrolled: [
+            {
+                type: Schema.Types.ObjectId,
+                required: true,
+                ref: "User",
+            },
+        ],
+        instructor: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: "User",
+        },
+        courseContent: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "CourseSection",
+            },
+        ],
+        ratingReview: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "RatingReview",
+            },
+        ],
+        instructions: {
+            type: [String],
+        },
+        status: {
+            type: String,
+            enum: ["Draft", "Published"],
+        },
+        category: {
+            type: mongoose.Schema.Types.ObjectId,
+            // required: true,
+            ref: "Category",
+        },
     },
-    courseDescription: {
-      type: String,
-      required: true,
-    },
-    whatYouWillLearn: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    thumbnail: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    studentEnrolled: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    instructor: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-    courseContent: {
-      type: Schema.Types.ObjectId,
-      ref: "CourseContent",
-    },
-    ratingReview: {
-      type: Schema.Types.ObjectId,
-      ref: "RatingReview",
-    },
-    courseSections: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "CourseSection",
-      },
-    ],
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
-const Courses = model("courses", courseSchema);
+const Courses = model("Courses", courseSchema);
 
 export default Courses;
