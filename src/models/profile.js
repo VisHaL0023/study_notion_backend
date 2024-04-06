@@ -5,13 +5,14 @@ const profileSchema = new Schema(
         gender: {
             type: String,
         },
-        dob: {
+        dateOfBirth: {
             type: String,
         },
         contactNumber: {
             type: String,
             required: true,
-            trim: true,
+            unique: true,
+            minLength: 10,
         },
         about: {
             type: String,

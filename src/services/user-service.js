@@ -1,6 +1,11 @@
-import { UserRepository, OTPRepository } from "../repositories/index.js";
-import bcrypt from "bcrypt";
+import {
+    UserRepository,
+    OTPRepository,
+    ProfileRepository,
+} from "../repositories/index.js";
 import { ServerConfig } from "../config/index.js";
+
+import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 
@@ -8,6 +13,7 @@ class UserService {
     constructor() {
         this.userRepository = new UserRepository();
         this.otpRepository = new OTPRepository();
+        this.profileRepository = new ProfileRepository();
     }
 
     async generateJWT(reqbody) {
@@ -15,13 +21,6 @@ class UserService {
             const user = await this.userRepository.findByEmail({
                 email: reqbody.email,
             });
-            if (!user) {
-                return jsonwebtoken.sign(
-                    { id: reqbody.contactNumber, email: reqbody.email },
-                    ServerConfig.JWT_SECRET_KEY,
-                    { expiresIn: "30d" }
-                );
-            }
             return jsonwebtoken.sign(
                 { id: user.id, email: user.email },
                 ServerConfig.JWT_SECRET_KEY,
@@ -32,32 +31,51 @@ class UserService {
         }
     }
 
-    async signUp(data) {
+    async signUp(reqbody) {
         try {
+            console.log("reqbody", reqbody);
             let user = await this.userRepository.findByEmail({
-                email: data.email,
+                email: reqbody.email,
             });
             if (!user) {
-                const token = await this.generateJWT(data);
-                user = await this.userRepository.create({
-                    ...data,
-                    token: token,
+                const response = await this.otpRepository.findOTP({
+                    email: reqbody.email,
                 });
-                if (token) {
-                    //         sendingMail({
-                    //             to: `${user.email}`,
-                    //             subject: "Account verification for Study Notion",
-                    //             text: `Hello, ${user.name} Please verify your email by
-                    // clicking this link :
-                    // http://localhost:${ServerConfig.PORT}/api/v1/auth/verify-email/${user.id}?token=${user.token} `,
-                    //         });
+
+                console.log("response otp", response);
+
+                if (response.length === 0 || reqbody.otp !== response[0].otp) {
+                    // OTP not found for the email or not equal to otp
                     throw {
-                        success: true,
-                        message: "Verify your mail",
-                        data: {},
-                        error: {},
+                        success: false,
+                        message: "The OTP is not valid",
                     };
                 }
+
+                let approved = "";
+                approved =
+                    reqbody.accountType === "Instructor"
+                        ? (approved = false)
+                        : (approved = true);
+
+                const profileDetails = await this.profileRepository.create({
+                    gender: null,
+                    dateOfBirth: null,
+                    contactNumber: reqbody.contactNumber,
+                    about: null,
+                });
+
+                const user = await this.userRepository.create({
+                    firstName: reqbody.firstName,
+                    lastName: reqbody.lastName,
+                    email: reqbody.email,
+                    password: reqbody.password,
+                    accountType: reqbody.accountType,
+                    approved: approved,
+                    profile: profileDetails._id,
+                    image: "sample",
+                });
+                return user;
             }
             throw {
                 success: false,
@@ -67,18 +85,6 @@ class UserService {
             };
         } catch (error) {
             console.log("Something went wrong in user service");
-            console.log(error);
-            throw error;
-        }
-    }
-
-    async comparePassword(reqbody) {
-        try {
-            const user = await this.userRepository.findByEmail({
-                email: reqbody.email,
-            });
-            return bcrypt.compareSync(reqbody.password, user.password);
-        } catch (error) {
             console.log(error);
             throw error;
         }
@@ -94,55 +100,25 @@ class UserService {
                 throw {
                     success: false,
                     message: "No user found",
-                    data: {},
-                    error: {},
                 };
             }
 
-            if (!(await this.comparePassword(reqbody))) {
-                throw {
+            const isPasswordMatch = bcrypt.compareSync(
+                reqbody.password,
+                user.password
+            );
+            if (isPasswordMatch) {
+                return res.status(401).json({
                     success: false,
-                    message: "Incorrect password",
-                    data: {},
-                    error: {},
-                };
+                    message: `Password is incorrect`,
+                });
             }
             const token = await this.generateJWT(reqbody);
 
-            if (user.isVerified) {
-                return (response = {
-                    token: token,
-                    userData: {
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        accountType: user.accountType,
-                        contactNumber: user.contactNumber,
-                        active: user.active,
-                    },
-                });
-            }
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
-    }
-
-    async verifyMail(reqbody) {
-        try {
-            const user = await this.userRepository.findByValue({
-                token: reqbody,
-            });
-            if (user.isVerified) {
-                throw {
-                    message: "User already Verified",
-                };
-            } else {
-                const updatedUser = await this.userRepository.update(user.id, {
-                    isVerified: true,
-                });
-                return updatedUser;
-            }
+            user.password = undefined;
+            const response = { ...user, token: token };
+            // Set cookie for token and return success response
+            return response;
         } catch (error) {
             console.log(error);
             throw error;
@@ -157,8 +133,6 @@ class UserService {
                 throw {
                     success: false,
                     message: "User already exists for given email",
-                    data: {},
-                    error: {},
                 };
             }
 

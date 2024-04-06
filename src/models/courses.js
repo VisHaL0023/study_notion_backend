@@ -20,7 +20,6 @@ const courseSchema = new Schema(
         },
         thumbnail: {
             type: String,
-            required: true,
         },
         price: {
             type: Number,
@@ -52,6 +51,10 @@ const courseSchema = new Schema(
         ],
         instructions: {
             type: [String],
+        },
+        tag: {
+            type: [String],
+            required: true,
         },
         status: {
             type: String,

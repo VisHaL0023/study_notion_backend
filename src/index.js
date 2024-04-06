@@ -6,12 +6,15 @@ import {
     ServerConfig,
     CloudinaryConfig,
 } from "./config/index.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 // body parser configuration
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieParser());
 
 CloudinaryConfig.connect();
 

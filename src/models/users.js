@@ -21,11 +21,8 @@ const userSchema = new Schema(
             isEmail: true, //checks for email format
             trim: true,
         },
-        contactNumber: {
+        image: {
             type: String,
-            required: true,
-            unique: true,
-            minLength: 10,
         },
         password: {
             type: String,
@@ -39,17 +36,9 @@ const userSchema = new Schema(
             default: "Student",
             enum: ["Student", "Instructor", "Admin"],
         },
-        active: {
-            type: Boolean,
-            required: true,
-            default: false,
-        },
-        isVerified: {
+        approved: {
             type: Boolean,
             default: false,
-        },
-        token: {
-            type: String,
         },
         courses: [
             {
