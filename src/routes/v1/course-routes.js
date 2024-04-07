@@ -8,6 +8,10 @@ let courseController = new CourseController();
 
 // Protected routes, need logged in to access it
 
+router.get("/", courseController.getAllCourses);
+
 router.post("/createCourse", authenticate, courseController.createCourse);
+
+router.post("/getCourseDetails", courseController.getCourseDetails);
 
 export default router;

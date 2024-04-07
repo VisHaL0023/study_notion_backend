@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ServerConfig } from "../config/index.js";
+import { errorObj } from "../utils/index.js";
+import { StatusCodes } from "http-status-codes";
 
 //auth
 export async function authenticate(req, res, next) {
@@ -12,10 +14,9 @@ export async function authenticate(req, res, next) {
 
         //if token missing, then return response
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "Token is missing",
-            });
+            errorObj.success = false;
+            errorObj.message = "Token is missing";
+            return res.status(StatusCodes.UNAUTHORIZED).json(errorObj);
         }
 
         //verify the token
@@ -25,16 +26,59 @@ export async function authenticate(req, res, next) {
             req.user = decode;
         } catch (err) {
             //verification - issue
-            return res.status(401).json({
-                success: false,
-                message: "token is invalid",
-            });
+            errorObj.success = false;
+            errorObj.message = "Token is invalid";
+            return res.status(StatusCodes.UNAUTHORIZED).json(errorObj);
         }
         next();
     } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: "Something went wrong while validating the token",
-        });
+        errorObj.success = false;
+        errorObj.message = "Something went wrong while validating the token";
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+    }
+}
+
+export async function instructorMiddleware(req, res, next) {
+    try {
+        if (req.user.accountType !== "Instructor") {
+            errorObj.success = false;
+            errorObj.message = "Only Instructor can access this route";
+            return res.status(StatusCodes.UNAUTHORIZED).json(errorObj);
+        }
+        next();
+    } catch (error) {
+        errorObj.success = false;
+        errorObj.message = "User role cannot be verified, please try again";
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+    }
+}
+
+export async function studentMiddleware(req, res, next) {
+    try {
+        if (req.user.accountType !== "Student") {
+            errorObj.success = false;
+            errorObj.message = "Only Student can access this route";
+            return res.status(StatusCodes.UNAUTHORIZED).json(errorObj);
+        }
+        next();
+    } catch (error) {
+        errorObj.success = false;
+        errorObj.message = "User role cannot be verified, please try again";
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+    }
+}
+
+export async function adminMiddleware(req, res, next) {
+    try {
+        if (req.user.accountType !== "Admin") {
+            errorObj.success = false;
+            errorObj.message = "Only Admin can access this route";
+            return res.status(StatusCodes.UNAUTHORIZED).json(errorObj);
+        }
+        next();
+    } catch (error) {
+        errorObj.success = false;
+        errorObj.message = "User role cannot be verified, please try again";
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
     }
 }

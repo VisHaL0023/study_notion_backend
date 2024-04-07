@@ -1,3 +1,13 @@
-import { authenticate } from "./userAuth.js";
+import {
+    authenticate,
+    adminMiddleware,
+    studentMiddleware,
+    instructorMiddleware,
+} from "./userAuth.js";
 
-export { authenticate };
+export {
+    authenticate,
+    instructorMiddleware,
+    adminMiddleware,
+    studentMiddleware,
+};

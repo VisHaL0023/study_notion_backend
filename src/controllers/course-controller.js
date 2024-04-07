@@ -40,6 +40,40 @@ class CourseController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
         }
     }
+
+    async getAllCourses(req, res) {
+        try {
+            const response = await courseService.getAllCourses();
+
+            successObj.message = "Fetched all Courses successfully";
+            successObj.success = true;
+            successObj.data = response;
+            return res.status(StatusCodes.OK).json(successObj);
+        } catch (error) {
+            // Handle any errors that occur during the creation of the course
+            console.error(error);
+            errorObj.message = error.message;
+            errorObj.err = error;
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+        }
+    }
+
+    async getCourseDetails(req, res) {
+        try {
+            const response = await courseService.getCourseDetails(req.body);
+
+            successObj.message = "Fetched Course successfully";
+            successObj.success = true;
+            successObj.data = response;
+            return res.status(StatusCodes.OK).json(successObj);
+        } catch (error) {
+            // Handle any errors that occur during the creation of the course
+            console.error(error);
+            errorObj.message = error.message;
+            errorObj.err = error;
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
+        }
+    }
 }
 
 export default CourseController;

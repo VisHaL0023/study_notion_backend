@@ -94,6 +94,31 @@ class CourseService {
             throw error;
         }
     }
+
+    async getAllCourses() {
+        try {
+            const allCourses = await this.coursesRepository.getAll();
+
+            return allCourses;
+        } catch (error) {
+            console.log("error in course service");
+            throw error;
+        }
+    }
+
+    async getCourseDetails(reqbody) {
+        try {
+            console.log(reqbody);
+            const course = await this.coursesRepository.getCourseDetails(
+                reqbody._id
+            );
+
+            return course;
+        } catch (error) {
+            console.log("error in course service");
+            throw error;
+        }
+    }
 }
 
 export default CourseService;

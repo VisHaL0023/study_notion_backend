@@ -26,6 +26,6 @@ const raitingSchema = new Schema(
     { timestamps: true }
 );
 
-const RaitingReview = model("RaitingReview", raitingSchema);
+const RatingReview = model("RatingReview", raitingSchema);
 
-export default RaitingReview;
+export default RatingReview;
