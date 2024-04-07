@@ -6,6 +6,7 @@ class OTPRepository extends CrudRepository {
         super(OTP);
     }
 
+    // To get latest OTP
     async findOTP(otp) {
         try {
             const user = await OTP.find(otp).sort({ createdAt: -1 }).limit(1);

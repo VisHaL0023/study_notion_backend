@@ -8,6 +8,7 @@ import { ServerConfig } from "../config/index.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import otpGenerator from "otp-generator";
+import errorObj from "../utils/error-response.js";
 
 class UserService {
     constructor() {
@@ -18,9 +19,12 @@ class UserService {
 
     async generateJWT(reqbody) {
         try {
-            const user = await this.userRepository.findByEmail({
+            // checking if user is present
+            const user = await this.userRepository.findOne({
                 email: reqbody.email,
             });
+
+            // returning token
             return jsonwebtoken.sign(
                 { id: user.id, email: user.email },
                 ServerConfig.JWT_SECRET_KEY,
@@ -33,38 +37,41 @@ class UserService {
 
     async signUp(reqbody) {
         try {
-            console.log("reqbody", reqbody);
-            let user = await this.userRepository.findByEmail({
+            // checking if user is present
+            let user = await this.userRepository.findOne({
                 email: reqbody.email,
             });
+            // if user not present already then we can create user
             if (!user) {
+                // Check OTP for the user in OTP model
                 const response = await this.otpRepository.findOTP({
                     email: reqbody.email,
                 });
 
-                console.log("response otp", response);
-
+                // OTP not found for the email or not equal to otp
                 if (response.length === 0 || reqbody.otp !== response[0].otp) {
-                    // OTP not found for the email or not equal to otp
                     throw {
                         success: false,
                         message: "The OTP is not valid",
                     };
                 }
 
+                // Check if user is "Instructor", if yes then he needs to approve else approved
                 let approved = "";
                 approved =
                     reqbody.accountType === "Instructor"
                         ? (approved = false)
                         : (approved = true);
 
+                // Creating users Profiles
                 const profileDetails = await this.profileRepository.create({
                     gender: null,
                     dateOfBirth: null,
-                    contactNumber: reqbody.contactNumber,
+                    contactNumber: null,
                     about: null,
                 });
 
+                // Creating user
                 const user = await this.userRepository.create({
                     firstName: reqbody.firstName,
                     lastName: reqbody.lastName,
@@ -73,17 +80,16 @@ class UserService {
                     accountType: reqbody.accountType,
                     approved: approved,
                     profile: profileDetails._id,
-                    image: "sample",
+                    image: "sample", // TODO: needs to add real image
                 });
                 return user;
             }
+            // Throw error if email already exists
             throw {
-                success: false,
                 message: "User already exists for given email",
-                data: {},
-                error: {},
             };
         } catch (error) {
+            // Handle error
             console.log("Something went wrong in user service");
             console.log(error);
             throw error;
@@ -92,34 +98,37 @@ class UserService {
 
     async signIn(reqbody) {
         try {
-            const user = await this.userRepository.findByEmail({
+            // checking if user is present
+            const user = await this.userRepository.findOne({
                 email: reqbody.email,
             });
 
             if (!user) {
                 throw {
-                    success: false,
                     message: "No user found",
                 };
             }
 
-            const isPasswordMatch = bcrypt.compareSync(
+            // Check password with current user
+            const isPasswordMatch = await bcrypt.compareSync(
                 reqbody.password,
                 user.password
             );
-            if (isPasswordMatch) {
-                return res.status(401).json({
-                    success: false,
-                    message: `Password is incorrect`,
-                });
+            if (!isPasswordMatch) {
+                throw {
+                    message: "Incorrect password",
+                };
             }
+            // Generate JWT token for user
             const token = await this.generateJWT(reqbody);
 
+            // Settign password undefined because we need to send user obj to frontend
             user.password = undefined;
-            const response = { ...user, token: token };
+
             // Set cookie for token and return success response
-            return response;
+            return { user, token };
         } catch (error) {
+            // Handle error
             console.log(error);
             throw error;
         }
@@ -127,23 +136,27 @@ class UserService {
 
     async sendOtp(email) {
         try {
-            const user = await this.userRepository.findByEmail({ email });
+            // checking if user is present
+            const user = await this.userRepository.findOne({ email });
 
             if (user) {
                 throw {
-                    success: false,
                     message: "User already exists for given email",
                 };
             }
 
+            // Generating OTP
             var otp = otpGenerator.generate(6, {
                 upperCaseAlphabets: true,
                 lowerCaseAlphabets: false,
                 specialChars: false,
             });
+
+            // Save OTP to database for 5 mints
             const response = await this.otpRepository.create({ email, otp });
             return response;
         } catch (error) {
+            // Handle errors
             console.log(error);
             return error;
         }

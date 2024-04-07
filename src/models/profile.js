@@ -10,8 +10,6 @@ const profileSchema = new Schema(
         },
         contactNumber: {
             type: String,
-            required: true,
-            unique: true,
             minLength: 10,
         },
         about: {

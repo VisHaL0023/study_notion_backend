@@ -7,6 +7,8 @@ const router = Router();
 
 router.use("/auth", authRoutes);
 router.use("/course", courseRoutes);
+
+// Checking api is live
 router.get("/info", InfoController.info);
 
 export default router;

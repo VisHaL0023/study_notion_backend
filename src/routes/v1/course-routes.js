@@ -6,6 +6,8 @@ const router = Router();
 
 let courseController = new CourseController();
 
+// Protected routes, need logged in to access it
+
 router.post("/createCourse", authenticate, courseController.createCourse);
 
 export default router;

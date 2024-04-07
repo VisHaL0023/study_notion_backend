@@ -24,19 +24,20 @@ class CourseController {
                 return res.status(StatusCodes.BAD_REQUEST).json(errorObj);
             }
 
+            // Create course using course-service
             const response = await courseService.createCourse(req);
+
             successObj.message = "Course created successfully";
             successObj.success = true;
             successObj.data = response;
+
             return res.status(StatusCodes.CREATED).json(successObj);
         } catch (error) {
             // Handle any errors that occur during the creation of the course
             console.error(error);
-            res.status(500).json({
-                success: false,
-                message: "Failed to create course",
-                error: error.message,
-            });
+            errorObj.message = error.message;
+            errorObj.err = error;
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(errorObj);
         }
     }
 }

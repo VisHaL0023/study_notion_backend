@@ -1,6 +1,5 @@
 import express, { json, urlencoded } from "express";
 import apiRoutes from "./routes/index.js";
-import bodyParser from "body-parser";
 import {
     DatabaseConfig,
     ServerConfig,
@@ -9,16 +8,14 @@ import {
 import cookieParser from "cookie-parser";
 
 const app = express();
+app.use(json());
 
-// body parser configuration
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+// to use cookie
 app.use(cookieParser());
 
+// Cloudinary connection build
 CloudinaryConfig.connect();
 
-app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use("/api", apiRoutes);
 

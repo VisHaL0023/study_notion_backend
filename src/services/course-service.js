@@ -3,8 +3,6 @@ import {
     UserRepository,
     CategoryRepository,
 } from "../repositories/index.js";
-import { errorObj, successObj } from "../utils/index.js";
-import { StatusCodes } from "http-status-codes";
 
 class CourseService {
     constructor() {
@@ -31,25 +29,27 @@ class CourseService {
                 status = "Draft";
             }
             // Check if the user is an instructor
-            const instructorDetails = await this.userRepository.get(userId, {
-                accountType: "Instructor",
-            });
+            const instructorDetails = await this.userRepository.findByValue(
+                userId,
+                {
+                    accountType: "Instructor",
+                }
+            );
 
             if (!instructorDetails) {
-                errorObj.success = false;
-                errorObj.message = "Instructor Details Not Found";
-                throw errorObj;
+                throw {
+                    message: "Instructor Details Not Found",
+                };
             }
 
             // Check if the tag given is valid
-            const categoryDetails =
-                await this.categoryRepository.findByCategory({
-                    name: category,
-                });
+            const categoryDetails = await this.categoryRepository.findOne({
+                name: category,
+            });
             if (!categoryDetails) {
-                errorObj.success = false;
-                errorObj.message = "Category Details Not Found";
-                throw errorObj;
+                throw {
+                    message: "Category Details Not Found",
+                };
             }
 
             // Create a new course with the given details
@@ -74,8 +74,7 @@ class CourseService {
                     $push: {
                         courses: newCourse._id,
                     },
-                },
-                { new: true }
+                }
             );
 
             // Add the new course to the Categories
@@ -85,15 +84,11 @@ class CourseService {
                     $push: {
                         courses: newCourse._id,
                     },
-                },
-                { new: true }
+                }
             );
+
             // Return the new course and a success message
-            console.log("all is well");
-            successObj.success = true;
-            successObj.data = newCourse;
-            successObj.message = "Course Created Successfully";
-            return successObj;
+            return newCourse;
         } catch (error) {
             console.log("Error in course service", error);
             throw error;
