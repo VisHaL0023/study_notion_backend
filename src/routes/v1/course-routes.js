@@ -14,4 +14,6 @@ router.post("/createCourse", authenticate, courseController.createCourse);
 
 router.post("/getCourseDetails", courseController.getCourseDetails);
 
+router.post("/searchCourse", courseController.searchCourse);
+
 export default router;

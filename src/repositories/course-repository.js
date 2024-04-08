@@ -34,6 +34,40 @@ class CoursesRepository extends CrudRepository {
             throw error;
         }
     }
+
+    async find(query) {
+        try {
+            console.log("query", query);
+            const response = await this.model
+                .findOne({
+                    $or: [
+                        {
+                            courseName: {
+                                $regex: query,
+                                $options: "i",
+                            },
+                        },
+                        { tag: { $regex: query, $options: "i" } },
+                        {
+                            courseDescription: {
+                                $regex: query,
+                                $options: "i",
+                            },
+                        },
+                    ],
+                })
+                .populate({
+                    path: "instructor",
+                })
+                .populate("category")
+                .populate("ratingReview")
+                .exec();
+            return response;
+        } catch (error) {
+            console.log("Something went wrong in CRUD Repo");
+            throw error;
+        }
+    }
 }
 
 export default CoursesRepository;
